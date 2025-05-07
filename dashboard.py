@@ -6,7 +6,7 @@ DEXSCREENER_URL = "https://api.dexscreener.com/latest/dex/pairs/ethereum/0x3ebec
 TOKEN_HOLDINGS = 25679363
 
 st.set_page_config(page_title="PEPU Price Dashboard", layout="centered")
-st.title("📊 PEPU Live Dashboard")
+st.title("📊 Marks Live Pepu Value")
 
 # === Fetch live price ===
 def fetch_price():
