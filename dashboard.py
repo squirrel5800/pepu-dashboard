@@ -30,11 +30,18 @@ if price:
     total_gbp = total_usd * GBP_RATE
     total_qar = total_usd * QAR_RATE
 
+    # Display token info
     st.metric("PEPU Token Price", f"${price:,.6f}")
     st.metric("Your Holdings", f"{TOKEN_HOLDINGS:,} tokens")
-    st.metric("Total Value (USD)", f"${total_usd:,.2f}")
-    st.metric("Total Value (EUR)", f"€{total_eur:,.2f}")
-    st.metric("Total Value (GBP)", f"£{total_gbp:,.2f}")
-    st.metric("Total Value (QAR)", f"﷼{total_qar:,.2f}")
+
+    # First row
+    col1, col2 = st.columns(2)
+    col1.metric("Total Value (USD)", f"${total_usd:,.2f}")
+    col2.metric("Total Value (EUR)", f"€{total_eur:,.2f}")
+
+    # Second row
+    col3, col4 = st.columns(2)
+    col3.metric("Total Value (GBP)", f"£{total_gbp:,.2f}")
+    col4.metric("Total Value (QAR)", f"﷼{total_qar:,.2f}")
 else:
     st.error("❌ Could not fetch live price. Try again later.")
