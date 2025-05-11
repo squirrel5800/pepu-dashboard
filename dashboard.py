@@ -3,7 +3,7 @@ import requests
 
 # === CONFIG ===
 DEXSCREENER_URL = "https://api.dexscreener.com/latest/dex/pairs/ethereum/0x3ebec0a1b4055c8d1180fce64db2a8c068170880"
-TOKEN_HOLDINGS = 25768361
+TOKEN_HOLDINGS = 25768361.2
 
 st.set_page_config(page_title="PEPU Price Dashboard", layout="centered")
 st.title("📊 Marks Live Pepu Value")
