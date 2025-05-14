@@ -5,7 +5,6 @@ import requests
 DEXSCREENER_URL = "https://api.dexscreener.com/latest/dex/pairs/ethereum/0x3ebec0a1b4055c8d1180fce64db2a8c068170880"
 TOKEN_HOLDINGS = 25795775
 
-# Manually set exchange rates (1 USD = X)
 EUR_RATE = 0.889
 GBP_RATE = 0.751
 QAR_RATE = 3.64
@@ -13,23 +12,33 @@ QAR_RATE = 3.64
 st.set_page_config(page_title="PEPU Price Dashboard", layout="centered")
 st.title("📊 Our Retirement Fund")
 
-# === Fetch token data ===
+# === Fetch token data safely ===
 def fetch_token_data():
     try:
         res = requests.get(DEXSCREENER_URL).json()
+        if 'pair' not in res:
+            st.error("❌ 'pair' not found in Dexscreener response.")
+            return None
+
         pair = res['pair']
+        price = float(pair.get('priceUsd', 0))
+        price_change = float(pair.get('priceChange', {}).get('h24', 0))
+        high_price = float(pair.get('priceUsd', 0)) * (1 + price_change / 100)
+        low_price = float(pair.get('priceUsd', 0)) * (1 - abs(price_change) / 100)
+
         return {
-            "price": float(pair['priceUsd']),
-            "priceChangePct": float(pair['priceChange']['h24']),
-            "high24h": float(pair['priceNative']['h24High']),
-            "low24h": float(pair['priceNative']['h24Low'])
+            "price": price,
+            "priceChangePct": price_change,
+            "high24h": high_price,
+            "low24h": low_price
         }
-    except:
+    except Exception as e:
+        st.error(f"❌ Error fetching data: {e}")
         return None
 
 data = fetch_token_data()
 
-if data:
+if data and data["price"] > 0:
     price = data["price"]
     pct_change = data["priceChangePct"]
     high_price = data["high24h"]
@@ -43,11 +52,9 @@ if data:
     total_usd_high = high_price * TOKEN_HOLDINGS
     total_usd_low = low_price * TOKEN_HOLDINGS
 
-    # === Display core metrics ===
     st.metric("PEPU Token Price", f"${price:,.6f}", f"{pct_change:.2f}% / 24h")
     st.metric("Your Holdings", f"{TOKEN_HOLDINGS:,} tokens")
 
-    # === Value rows ===
     col1, col2 = st.columns(2)
     col1.metric("Total Value (USD)", f"${total_usd:,.2f}")
     col2.metric("Total Value (EUR)", f"€{total_eur:,.2f}")
@@ -56,7 +63,6 @@ if data:
     col3.metric("Total Value (GBP)", f"£{total_gbp:,.2f}")
     col4.metric("Total Value (QAR)", f"﷼{total_qar:,.2f}")
 
-    # === 24h Change Box ===
     st.markdown("---")
     st.subheader("📈 24h Performance Summary")
 
@@ -65,4 +71,4 @@ if data:
     col6.metric("🔺 24h High Value", f"${total_usd_high:,.2f}")
     col7.metric("🔻 24h Low Value", f"${total_usd_low:,.2f}")
 else:
-    st.error("❌ Could not fetch live data. Try again later.")
+    st.error("❌ Could not fetch or parse live data.")
