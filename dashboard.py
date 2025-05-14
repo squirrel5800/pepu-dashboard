@@ -1,4 +1,3 @@
-
 import streamlit as st
 import requests
 
@@ -14,34 +13,56 @@ QAR_RATE = 3.64
 st.set_page_config(page_title="PEPU Price Dashboard", layout="centered")
 st.title("📊 Our Retirement Fund")
 
-# === Fetch live token price in USD ===
-def fetch_price():
+# === Fetch token data ===
+def fetch_token_data():
     try:
         res = requests.get(DEXSCREENER_URL).json()
-        return float(res['pair']['priceUsd'])
+        pair = res['pair']
+        return {
+            "price": float(pair['priceUsd']),
+            "priceChangePct": float(pair['priceChange']['h24']),
+            "high24h": float(pair['priceNative']['h24High']),
+            "low24h": float(pair['priceNative']['h24Low'])
+        }
     except:
         return None
 
-price = fetch_price()
+data = fetch_token_data()
 
-if price:
+if data:
+    price = data["price"]
+    pct_change = data["priceChangePct"]
+    high_price = data["high24h"]
+    low_price = data["low24h"]
+
     total_usd = price * TOKEN_HOLDINGS
     total_eur = total_usd * EUR_RATE
     total_gbp = total_usd * GBP_RATE
     total_qar = total_usd * QAR_RATE
 
-    # Display token info
-    st.metric("PEPU Token Price", f"${price:,.6f}")
+    total_usd_high = high_price * TOKEN_HOLDINGS
+    total_usd_low = low_price * TOKEN_HOLDINGS
+
+    # === Display core metrics ===
+    st.metric("PEPU Token Price", f"${price:,.6f}", f"{pct_change:.2f}% / 24h")
     st.metric("Your Holdings", f"{TOKEN_HOLDINGS:,} tokens")
 
-    # First row
+    # === Value rows ===
     col1, col2 = st.columns(2)
     col1.metric("Total Value (USD)", f"${total_usd:,.2f}")
     col2.metric("Total Value (EUR)", f"€{total_eur:,.2f}")
 
-    # Second row
     col3, col4 = st.columns(2)
     col3.metric("Total Value (GBP)", f"£{total_gbp:,.2f}")
     col4.metric("Total Value (QAR)", f"﷼{total_qar:,.2f}")
+
+    # === 24h Change Box ===
+    st.markdown("---")
+    st.subheader("📈 24h Performance Summary")
+
+    col5, col6, col7 = st.columns(3)
+    col5.metric("💸 Change (24h)", f"{pct_change:.2f}%", delta_color="normal")
+    col6.metric("🔺 24h High Value", f"${total_usd_high:,.2f}")
+    col7.metric("🔻 24h Low Value", f"${total_usd_low:,.2f}")
 else:
-    st.error("❌ Could not fetch live price. Try again later.")
+    st.error("❌ Could not fetch live data. Try again later.")
