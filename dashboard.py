@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # === CONFIG ===
-DEXSCREENER_URL = "https://api.dexscreener.com/latest/dex/pairs/ethereum/0x3ebec0a1b4055c8d1180fce64db2a8c068170880"
+DEXSCREENER_URL = "https://dexscreener.com/ethereum/0xb1b10b05aa043dd8d471d4da999782bc694993e3ecbe8e7319892b261b412ed5"
 TOKEN_HOLDINGS = 30000000
 
 EUR_RATE = 0.889
