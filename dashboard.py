@@ -4,7 +4,7 @@ import requests
 # === CONFIG ===
 DEXSCREENER_URL = "https://api.dexscreener.com/latest/dex/pairs/ethereum/0xb1b10b05aa043dd8d471d4da999782bc694993e3ecbe8e7319892b261b412ed5"
 
-TOKEN_HOLDINGS = 32435035
+TOKEN_HOLDINGS = 33117689
 
 EUR_RATE = 0.889
 GBP_RATE = 0.751
